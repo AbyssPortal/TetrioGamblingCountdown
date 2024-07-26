@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="content" style="display: none;">
+        <div id="countdown"></div>
+
+        <audio id="background-music" src="music/waiting.mp3" loop></audio>
+        <audio id="blitz-music" src="music/blitz.mp3"></audio>
+    </div>
+    <button id="play-button">Enter website</button>
+    <script>
+        let start_difference = -1;
+        function updateCountdown() {
+            const targetDate = new Date(Date.UTC(2024, 6, 26, 18, 0, 0)); // 26 July 2024, 18:00:00 UTC
+            const now = new Date();
+            const difference = targetDate - now;
+            if (start_difference == -1) {
+                start_difference = difference;
+            }
+
+            if (difference <= 0) {
+                document.getElementById('countdown').innerHTML = "The event has started!";
+                clearInterval(interval);
+                return;
+            }
+
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            console.log(difference);
+
+            document.getElementById('countdown').innerHTML =
+                `${days}D ${hours}H ${minutes}M ${seconds}s`;
+
+            let needed_difference = 2 * 60 * 1000
+
+
+
+            if (difference <= needed_difference + 5000) {
+                const background = document.getElementById('background-music');
+                const fadeOutInterval = setInterval(() => {
+                    if (background.volume > 0.01) {
+                        background.volume -= 0.01; // Decrease the volume by 0.1 every interval
+                    } else {
+                        clearInterval(fadeOutInterval); // Stop the interval when volume reaches 0
+                        background.pause();
+                    }
+                }, 20); // Adjust the interval duration for a smoother fade-out effect
+            }
+            if (difference <= needed_difference) {
+                const blitz = document.getElementById('blitz-music');
+                blitz.play();
+            }
+        }
+
+        const interval = setInterval(updateCountdown, 1000);
+        updateCountdown(); // Initial call to display the countdown immediately
+
+        document.getElementById('play-button').addEventListener('click', function() {
+            const audio = document.getElementById('background-music');
+            const blitz = document.getElementById('blitz-music');
+            blitz.play();
+            blitz.pause();
+            audio.play();
+            document.getElementById('content').style.display = 'block';
+            this.style.display = 'none'; // Hide the button after clicking
+        });
+    </script>
+</body>
+
+</html>
